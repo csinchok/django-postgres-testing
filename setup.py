@@ -6,6 +6,7 @@ setup_requires = []
 install_requires = [
     "django>=1.9",
     "pg8000",
+    "psycopg2"
 ]
 
 setup(
