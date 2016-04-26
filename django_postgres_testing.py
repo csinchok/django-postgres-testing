@@ -1,8 +1,8 @@
 import copy
 import shutil
 import subprocess
+import os
 import tempfile
-import sys
 import psycopg2
 import os.path
 from glob import glob
@@ -32,18 +32,19 @@ class TemporaryPostgresRunner(DiscoverRunner):
 
     def setup_databases(self, **kwargs):
 
-        postgres_binary_path = None
+        postgres_binary_path = os.environ.get('TEMPORARY_POSTGRES_PATH')
 
-        # Try to find the initdb binary
-        initdb_path = shutil.which('initdb')
-        if initdb_path:
-            postgres_binary_path = os.path.dirname(initdb_path)
-        else:
-            for base_dir in SEARCH_PATHS:
-                path = os.path.join(base_dir, 'bin', 'initdb')
-                if os.path.exists(path):
-                    postgres_binary_path = os.path.join(base_dir, 'bin')
-                    break
+        if not postgres_binary_path:
+            # Try to find the initdb binary
+            initdb_path = shutil.which('initdb')
+            if initdb_path:
+                postgres_binary_path = os.path.dirname(initdb_path)
+            else:
+                for base_dir in SEARCH_PATHS:
+                    path = os.path.join(base_dir, 'bin', 'initdb')
+                    if os.path.exists(path):
+                        postgres_binary_path = os.path.join(base_dir, 'bin')
+                        break
 
         self.postgres_socket_directory = tempfile.mkdtemp(prefix='postgres_socket')
         self.postgres_directory = tempfile.mkdtemp(prefix='postgres_data')
@@ -57,7 +58,7 @@ class TemporaryPostgresRunner(DiscoverRunner):
         # Create the database...
         init_process = subprocess.Popen(
             initdb_args,
-            # stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         init_process.wait()
 
@@ -73,7 +74,7 @@ class TemporaryPostgresRunner(DiscoverRunner):
             postgres_args,
             bufsize=1,
             universal_newlines=1,
-            # stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
         self._old_databases = copy.copy(connections.databases)
