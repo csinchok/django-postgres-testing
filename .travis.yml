@@ -8,4 +8,4 @@ python:
 # command to install dependencies
 install: "pip install -e ."
 # command to run tests
-script: cd /testproject && python manage.py test
+script: cd ./testproject && python manage.py test
