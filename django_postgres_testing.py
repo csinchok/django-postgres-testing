@@ -11,7 +11,7 @@ from django.db import connections
 from django.test.runner import DiscoverRunner
 
 
-INITDB = '/usr/local/bin/initdb'
+INITDB = 'initdb'
 
 
 def get_open_port():

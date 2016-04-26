@@ -1,3 +1,5 @@
+import django
+
 from django.test import TestCase
 
 from .models import TestModel
@@ -14,4 +16,5 @@ class SampleTestCase(TestCase):
 
         one = TestModel.objects.get()
         self.assertTrue(one.id is not None)
-        self.assertIsInstance(one.baz, dict)
+        if django.VERSION[1] >= 9:
+            self.assertIsInstance(one.baz, dict)
