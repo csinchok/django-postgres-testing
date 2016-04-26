@@ -2,8 +2,10 @@ import copy
 import shutil
 import subprocess
 import tempfile
-import time
+import sys
 import psycopg2
+import os.path
+from glob import glob
 
 from contextlib import closing
 
@@ -11,7 +13,9 @@ from django.db import connections
 from django.test.runner import DiscoverRunner
 
 
-INITDB = 'initdb'
+SEARCH_PATHS = (['/usr/local/pgsql', '/usr/local'] +
+                glob('/usr/lib/postgresql/*') +  # for Debian/Ubuntu
+                glob('/opt/local/lib/postgresql*'))  # for MacPorts
 
 
 def get_open_port():
@@ -28,10 +32,23 @@ class TemporaryPostgresRunner(DiscoverRunner):
 
     def setup_databases(self, **kwargs):
 
+        postgres_binary_path = None
+
+        # Try to find the initdb binary
+        initdb_path = shutil.which('initdb')
+        if initdb_path:
+            postgres_binary_path = os.path.dirname(initdb_path)
+        else:
+            for base_dir in SEARCH_PATHS:
+                path = os.path.join(base_dir, 'bin', 'initdb')
+                if os.path.exists(path):
+                    postgres_binary_path = os.path.join(base_dir, 'bin')
+                    break
+
         self.postgres_directory = tempfile.mkdtemp(prefix='postgres')
         self.postgres_port = get_open_port()
         initdb_args = [
-            'initdb',
+            os.path.join(postgres_binary_path, 'initdb'),
             '-A', 'trust',
             '-U', 'postgres',
             '-D', self.postgres_directory
@@ -43,10 +60,9 @@ class TemporaryPostgresRunner(DiscoverRunner):
         init_process.wait()
 
         postgres_args = [
-            'postgres',
+            os.path.join(postgres_binary_path, 'postgres'),
             '-h 127.0.0.1',
             '-F',
-            # '-c', 'logging_collector=false'
             '-p', str(self.postgres_port),
             '-D', self.postgres_directory
         ]
