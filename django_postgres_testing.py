@@ -45,7 +45,8 @@ class TemporaryPostgresRunner(DiscoverRunner):
                     postgres_binary_path = os.path.join(base_dir, 'bin')
                     break
 
-        self.postgres_directory = tempfile.mkdtemp(prefix='postgres')
+        self.postgres_socket_directory = tempfile.mkdtemp(prefix='postgres_socket')
+        self.postgres_directory = tempfile.mkdtemp(prefix='postgres_data')
         self.postgres_port = get_open_port()
         initdb_args = [
             os.path.join(postgres_binary_path, 'initdb'),
@@ -65,7 +66,8 @@ class TemporaryPostgresRunner(DiscoverRunner):
             '-h 127.0.0.1',
             '-F',
             '-p', str(self.postgres_port),
-            '-D', self.postgres_directory
+            '-D', self.postgres_directory,
+            '-k', self.postgres_socket_directory
         ]
         self.postgres_process = subprocess.Popen(
             postgres_args,
@@ -108,5 +110,5 @@ class TemporaryPostgresRunner(DiscoverRunner):
         self.postgres_process.wait()
 
         shutil.rmtree(self.postgres_directory)
-
+        shutil.rmtree(self.postgres_socket_directory)
         return ret
