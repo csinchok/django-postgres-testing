@@ -46,13 +46,16 @@ class TemporaryPostgresRunner(DiscoverRunner):
                         postgres_binary_path = os.path.join(base_dir, 'bin')
                         break
 
-        self.postgres_socket_directory = tempfile.mkdtemp(prefix='postgres_socket')
-        self.postgres_directory = tempfile.mkdtemp(prefix='postgres_data')
+        self.postgres_socket_directory = tempfile.mkdtemp(prefix='pgsocket')
+        self.postgres_directory = tempfile.mkdtemp(prefix='pgdata')
         self.postgres_port = get_open_port()
+
+        print('Initializing test Postgresql cluster...')
         initdb_args = [
             os.path.join(postgres_binary_path, 'initdb'),
             '-A', 'trust',
             '-U', 'postgres',
+            '--nosync',
             '-D', self.postgres_directory
         ]
         # Create the database...
@@ -62,6 +65,10 @@ class TemporaryPostgresRunner(DiscoverRunner):
         )
         init_process.wait()
 
+        if init_process.returncode != 0:
+            raise Exception('Couldn\'t  initialize database')
+
+        print('Starting test Postgresql cluster...')
         postgres_args = [
             os.path.join(postgres_binary_path, 'postgres'),
             '-h 127.0.0.1',
@@ -96,6 +103,8 @@ class TemporaryPostgresRunner(DiscoverRunner):
                 ):
                     pass
             except psycopg2.OperationalError:
+                # if not self.postgres_process.poll():
+                    # raise Exception('Couldn\'t start postgres')
                 continue
             else:
                 break

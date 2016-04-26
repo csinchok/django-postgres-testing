@@ -3,6 +3,7 @@
 __pycache__
 
 /bin
+/dist
 /include
 /lib
 pip-selfcheck.json
