@@ -37,9 +37,10 @@ class TemporaryPostgresRunner(DiscoverRunner):
             '-D', self.postgres_directory
         ]
         # Create the database...
-        subprocess.run(
+        init_process = subprocess.Popen(
             initdb_args,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        init_process.wait()
 
         postgres_args = [
             'postgres',
