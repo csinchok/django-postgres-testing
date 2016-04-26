@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import tempfile
 import time
-import pg8000
+import psycopg2
 
 from contextlib import closing
 
@@ -65,15 +65,16 @@ class TemporaryPostgresRunner(DiscoverRunner):
 
         # Let postgres start up...
         while True:
-            time.sleep(0.1)
             try:
-                with closing(pg8000.connect(
-                    user='postgres',
-                    host='localhost',
-                    port=self.postgres_port)
+                with closing(
+                    psycopg2.connect(
+                        host='localhost',
+                        port=self.postgres_port,
+                        user='postgres'
+                    )
                 ):
                     pass
-            except pg8000.Error:
+            except psycopg2.OperationalError:
                 continue
             else:
                 break

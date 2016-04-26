@@ -4,8 +4,7 @@ from setuptools import setup
 setup_requires = []
 
 install_requires = [
-    "django>=1.9",
-    "pg8000",
+    "django>=1.7",
     "psycopg2"
 ]
 
