@@ -56,7 +56,8 @@ class TemporaryPostgresRunner(DiscoverRunner):
         # Create the database...
         init_process = subprocess.Popen(
             initdb_args,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
         init_process.wait()
 
         postgres_args = [
@@ -70,7 +71,7 @@ class TemporaryPostgresRunner(DiscoverRunner):
             postgres_args,
             bufsize=1,
             universal_newlines=1,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            # stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
         self._old_databases = copy.copy(connections.databases)
