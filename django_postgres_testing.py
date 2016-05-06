@@ -1,5 +1,6 @@
 import copy
 import shutil
+import signal
 import subprocess
 import os
 import tempfile
@@ -116,7 +117,7 @@ class TemporaryPostgresRunner(DiscoverRunner):
             old_config, **kwargs
         )
 
-        self.postgres_process.kill()
+        self.postgres_process.send_signal(signal.SIGINT)
         self.postgres_process.wait()
 
         shutil.rmtree(self.postgres_directory)
