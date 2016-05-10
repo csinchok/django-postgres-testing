@@ -33,7 +33,7 @@ class TemporaryPostgresRunner(DiscoverRunner):
 
     def setup_databases(self, **kwargs):
 
-        postgres_binary_path = os.environ.get('TEMPORARY_POSTGRES_PATH')
+        postgres_binary_path = os.environ.get('POSTGRES_BIN')
 
         if not postgres_binary_path:
             # Try to find the initdb binary
