@@ -1,4 +1,4 @@
-# django-postgres-testing [![Build Status](https://travis-ci.org/csinchok/django-postgres-testing.svg?branch=master)](https://travis-ci.org/csinchok/django-postgres-testing)
+# django-postgres-testing [![Build Status](https://travis-ci.org/csinchok/django-postgres-testing.svg?branch=master)](https://travis-ci.org/csinchok/django-postgres-testing) [![PyPI version](https://badge.fury.io/py/django-postgres-testing.svg)](https://badge.fury.io/py/django-postgres-testing)
 
 This package contains a simple Django TestRunner that will setup a temporary postgres instance, and remove it when testing is over.
 
