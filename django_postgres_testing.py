@@ -90,7 +90,6 @@ class TemporaryPostgresRunner(DiscoverRunner):
         for name, settings in self._old_databases.items():
             connections.databases[name]['HOST'] = 'localhost'
             connections.databases[name]['PORT'] = self.postgres_port
-            connections.databases[name]['USER'] = 'postgres'
 
         # Let postgres start up...
         while True:
@@ -109,6 +108,33 @@ class TemporaryPostgresRunner(DiscoverRunner):
                 continue
             else:
                 break
+
+        # Now let's create a user:
+
+        for name, settings in self._old_databases.items():
+            username = connections.databases[name]['USER']
+
+            createuser_args = [
+                os.path.join(postgres_binary_path, 'createuser'),
+                '-h', 'localhost',
+                '-p', str(self.postgres_port),
+                '-U', 'postgres',
+                '--createdb',
+                username
+            ]
+            create_process = subprocess.Popen(
+                createuser_args,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            create_process.wait()
+
+            if create_process.returncode != 0:
+                self.postgres_process.send_signal(signal.SIGINT)
+                self.postgres_process.wait()
+
+                shutil.rmtree(self.postgres_directory)
+                shutil.rmtree(self.postgres_socket_directory)
+                raise Exception('Couldn\'t create user')
 
         return super(TemporaryPostgresRunner, self).setup_databases(**kwargs)
 
