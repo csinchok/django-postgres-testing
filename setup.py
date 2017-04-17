@@ -13,7 +13,7 @@ setup(
     author_email='chris@sinchok.com',
     name='django-postgres-testing',
     version='0.4',
-    url='https://github.com/sinchok/django-postgres-testing',
+    url='https://github.com/csinchok/django-postgres-testing',
     py_modules=['django_postgres_testing'],
     install_requires=install_requires,
 )
